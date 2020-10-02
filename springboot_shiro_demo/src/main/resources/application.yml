@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:mysql:///shrio?characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver  #这里的MySQL的版本较高，需要加cj
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true #驼峰命名转换
+server:
+  port: 81

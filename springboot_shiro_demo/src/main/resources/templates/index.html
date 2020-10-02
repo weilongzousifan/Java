@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎光临</title>
+</head>
+<body>
+    网站首页，
+    欢迎光临<shiro:principal property="username"></shiro:principal>
+
+    <a shiro:hasRole="role_superman" href="/user/del/1">删除用户ID=1</a>
+    <a shiro:hasAnyPermissions="user:select,user:del:id">查看所有</a>
+</body>
+</html>
