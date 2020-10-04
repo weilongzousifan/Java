@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heima.dao.UserMapper">
+    <!--查询所有  id:方法名  resultType：与数据库映射的类的全路径  -->
+    <select id="findAll" resultType="com.heima.domain.User">
+        select *from user ;
+    </select>
+
+    <!--添加用户，并查询刚刚添加完成的用户ID-->
+    <insert id="AddUser" parameterType="com.heima.domain.User">
+        <!--keyProperty：主键类型  keyColumn：主键对应的列  resultType：返回值类型  order：什么时候查询，sql语句执行期前/后-->
+        <selectKey keyProperty="id"  resultType="Integer" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+          insert  into  user  values (#{id},#{username},#{birthday},#{sex},#{address});
+    </insert>
+
+    <!--更新用户-->
+    <update id="updateUser" parameterType="com.heima.domain.User">
+          update user set username =#{username},address=#{address} where id=#{id};
+    </update>
+
+    <!--删除用户-->
+    <delete id="deleteUser" parameterType="Integer">
+/*这里的id值可以任意指定*/
+          delete from user where id=#{uid};
+    </delete>
+
+    <!--根据用户ID查询用户  -->
+    <select id="selectUserById" parameterType="Integer" resultType="com.heima.domain.User">
+        select *from user where id=#{uid};
+    </select>
+
+    <!--根据姓名模糊查询用户  -->
+    <select id="selectUserByName" parameterType="String" resultType="com.heima.domain.User">
+        select *from user where username like #{username01};
+        <!--这里的值必须为value，了解即可-->
+        <!--select *from user where username like '%${value}%';-->
+    </select>
+
+    <!--获取所有的用户数量  -->
+    <select id="findUserAll" resultType="Integer">
+        select count(id) from  user ;
+    </select>
+
+    <!--模糊查询用户  -->
+    <select id="findAllUerByName" parameterType="com.heima.domain.QueryVo" resultType="com.heima.domain.User">
+      select *from user where username like #{user.username};
+    </select>
+
+    <!--根据条件查询用户  -->
+   <!-- where 1=1 是为了避免where 关键字后面的第一个词直接就是 "and"而导致语法错误。-->
+    <select id="findUserNameByCondition" resultType="User" parameterType="user">
+        <!--select *from user where 1=1
+        <if test="id!=null">
+            and id=#{id}
+        </if>
+        <if test="username!=null">
+            and username=#{username}
+        </if>-->
+
+        select *from user
+        <where>
+            <if test="id!=null">
+                and id=#{id}
+            </if>
+            <if test="username!=null">
+                and username=#{username}
+            </if>
+        </where>
+    </select>
+
+    <!--根据queryvo提供的id集合查询用户  -->
+    <select id="findAllUserByIds" parameterType="QueryVo" resultType="User">
+      select *from user
+      <where>
+          <if test="ids!=null and ids.size()>0">
+              <!--collection:代表要遍历的集合元素，注意编写时不要写#{}
+                  open:代表语句的开始部分     close:代表结束部分
+                  item:代表遍历集合的每个元素，生成的变量名
+                  sperator:代表分隔符
+                  #{uid}：#{}里的值要和item的值相同 -->
+              <foreach collection="ids" open=" and id in (" close=")" item="uid" separator=",">
+                      #{uid}
+              </foreach>
+          </if>
+      </where>
+    </select>
+
+    <!--****************************一对多配置********************************************-->
+    
+    <resultMap id="findUserAccounts" type="user">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="birthday" column="birthday"></result>
+        <result property="sex" column="sex"></result>
+        <result property="address" column="address"></result>
+
+        <!--配置一对多关系映射-->
+        <collection property="accounts" ofType="account">
+            <!--aid:给数据库中的Account表的id字段起别名，防止和上面的user表中的id冲突-->
+            <id property="ID" column="aid"></id>
+            <result property="UID" column="UID"></result>
+            <result property="MONEY" column="MONEY"></result>
+        </collection>
+    </resultMap>
+
+    <select id="findAllUserAccount" resultMap="findUserAccounts">
+        SELECT * FROM `user` u LEFT JOIN account a ON u.id=a.UID
+    </select>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heima.dao.AccountMapper">
+
+    <resultMap id="AccountUser" type="account">
+        <id property="ID" column="ID"></id>
+        <result property="UID" column="UID"></result>
+        <result property="MONEY" column="MONEY"></result>
+        <!--配置一对一的关系映射  配置封装user内容
+            property：引用的实体类
+            column：两表之间的外键【可省略】
+            javaType：封装的是哪一个对象 -->
+        <association property="user" column="UID" javaType="user">
+            <id property="id" column="id"></id>
+            <result property="username" column="username"></result>
+            <result property="birthday" column="birthday"></result>
+            <result property="sex" column="sex"></result>
+            <result property="addreess" column="addreess"></result>
+        </association>
+    </resultMap>
+
+    <select id="findAll" resultMap="AccountUser">
+        SELECT u.id,username,birthday,a.ID,a.MONEY FROM `user` u,account a WHERE u.id=a.UID
+    </select>
+</mapper>

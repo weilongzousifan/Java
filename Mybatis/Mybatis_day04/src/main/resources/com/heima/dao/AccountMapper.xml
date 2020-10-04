@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heima.dao.AccountMapper">
+
+    <!--开启user支持二级缓存-->
+    <cache/>
+
+    <resultMap id="AccountUser" type="account">
+        <id property="ID" column="ID"></id>
+        <result property="UID" column="UID"></result>
+        <result property="MONEY" column="MONEY"></result>
+        <!--配置一对一延迟加载
+            property：引用的实体类
+            javaType：封装的是哪一个对象
+            select:查询用户的唯一标识，名称空间namespace.方法名【id】
+            column：查询时所需要的参数，这里为根据id查询用户所需要的参数【必须写】
+
+             在主配置文件中，开启延迟加载-->
+        <association property="user" column="UID" javaType="user" select="com.heima.dao.UserMapper.selectUserById"></association>
+    </resultMap>
+
+    <select id="findAll" resultMap="AccountUser">
+        SELECT * FROM account
+    </select>
+    
+    <select id="findAllAccount" parameterType="Integer" resultType="account" useCache="true">
+        select *from account where uid=#{uid}
+    </select>
+</mapper>
